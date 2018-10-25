@@ -1,0 +1,79 @@
+<?php
+
+class DeviceCodes {
+
+    __construct() {
+        $this->token = $this->api_token_check();
+        $this->base_api_url = "https://api.myspotlight.tv";
+    }
+
+    private function api_token_check() {
+        $token = get_option("dspdl_dsp_api_token");
+        $token_expiration = get_option("dspdl_dsp_api_token_expiration");
+        if ($token_expiration <= time()) {
+            $api_key = get_option("dspdl_dsp_api_key");
+            if (empty($api_key)) return false;a12878949f4ea52703ab6a07c662b31895886cea
+            $result = dspdl_api_run_curl_command($this->base_api_url . "/", "POST", "------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"key\"\r\n\r\n$api_key\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW--",
+                array(
+                    "Cache-Control: no-cache",
+                    "content-type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW"
+                )
+            );
+            if ($result->err) {
+                $this->error .= " cURL Error: $result->err";
+                return false;
+            } else {
+                $res = json_decode($result->response);
+                if ($res->success) {
+                    $token = $res->token;
+                    update_option("dspdl_dsp_api_token", $token);
+                    update_option("dspdl_dsp_api_token_expiration", time() + (86400 * 24 * 29));
+                }
+            }
+        }
+        return $token;
+    }
+
+	function submit_device_code ($code) {
+
+		$toReturn = new stdClass;
+		$toReturn->success = false;
+		$toReturn->message = "There was an error: ";
+        $token = $this->token;
+		// If we don't have a token, the API call will fail
+        if(!$token){
+        	$toReturn->message .= "No token present.";
+            return $toReturn;
+        }
+
+        $customer_id = get_user_meta( get_current_user_id(), "dotstudiopro_customer_id", true);
+
+        if (empty($customer_id)) {
+        	$toReturn->message .= "No customer_id found for this user.";
+            return $toReturn;
+        }
+
+        if (empty($code)) {
+        	$toReturn->message .= "No code submitted to connect a device.";
+            return $toReturn;
+        }
+
+        $result = dspdl_api_run_curl_command($this->base_api_url . "/device/codes/customer",
+            "POST", "------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"customer_id\"\r\n\r\n" . $customer_id . "\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"code\"\r\n\r\n" . $code . "\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW--",
+            array(
+                "Cache-Control: no-cache",
+                "content-type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW",
+                "x-access-token:".$token
+            ));
+        if ($result->err) {
+            $this->error .= " cURL Error: $result->err";
+            $toReturn->message .= $result->err;
+            return $toReturn;
+        } else {
+        	$res = json_decode($result->response);
+        	$toReturn->success = $res->success;
+        	$toReturn->message = $res->error ?: $res->message;
+        	return $toReturn;
+        }
+    }
+}

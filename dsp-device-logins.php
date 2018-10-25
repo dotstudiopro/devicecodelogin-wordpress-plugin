@@ -1,6 +1,6 @@
 <?php
 /*
-Plugin Name:  DSP Device Login Codes
+Plugin Name:  dotstudioPRO Device Login Codes
 Description:  Gets a DSP customer via Auth0 (during login) and sets up the ability to connect a device login code to an account
 Version:      1.0
 Author:       DSP
@@ -18,3 +18,34 @@ add_shortcode( 'dspdl_show_form', 'dspdl_customer_form_shortcode' );
 
 // Scripts and styles
 add_action( 'wp_enqueue_scripts', 'dspdl_scripts' );
+
+/** Add Menu Entry **/
+function dspdl_options_menu() {
+    add_options_page('Device Login Options', 'Device Login Options', 'manage_options', 'dspdl-device-login-options', 'dspdl_menu_page');
+}
+
+add_action('admin_menu', 'dspdl_options_menu');
+
+// Set up the page for the plugin, pulling the content based on various $_GET global variable contents
+function dspdl_menu_page()
+{
+    if (!current_user_can('manage_options')) {
+        wp_die(__('You do not have sufficient permissions to access this page.'));
+    }
+
+    echo "<div class='wrap'>";
+
+    require "menu.tpl.php";
+
+    echo "</div>";
+
+}
+/** End Menu Entry **/
+
+// Scripts and styles
+add_action( 'admin_enqueue_scripts', 'dspdl_admin_scripts' );
+
+/** Save Admin Menu Options **/
+add_action('admin_post_dspdl_save_admin_options', 'dspdl_save_admin_options');
+add_action('wp_ajax_dspdl_save_admin_options', 'dspdl_save_admin_options');
+/** End Save Admin Menu Options **/

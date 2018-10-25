@@ -1,0 +1,11 @@
+.dspdl-device-login-settings > table > tbody > tr > td.save-message {
+	display: none;
+}
+
+.dspdl-device-login-settings > table > tbody > tr > td.save-message.dspdl-options-save-success {
+	color: #41b366e6;
+}
+
+.dspdl-device-login-settings > table > tbody > tr > td.save-message.dspdl-options-save-failure {
+	color: #b93333e6;
+}

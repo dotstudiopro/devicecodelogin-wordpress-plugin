@@ -1,5 +1,49 @@
 <?php
 
+/**
+ * Simplify the cURL execution for various API commands within the curl commands class
+ *
+ * @return null
+ */
+function dspdl_save_admin_options() {
+	if(!isset($_POST['dspdl_dsp_api_key'])) {
+		return wp_send_json_failure(400, array("message" => "Missing API Key"));
+	}
+	update_option("dspdl_dsp_api_key", $_POST['dspdl_dsp_api_key']);
+	return wp_send_json_success(200, array("message" => "Key saved successfully"));
+}
+
+/**
+ * Simplify the cURL execution for various API commands within the curl commands class
+ *
+ * @param string $curl_url The URL to do the cUrl request to
+ * @param string $curl_request_type The type of request, generally POST or GET
+ * @param string $curl_post_fields The fields we want to POST, if it's a POST request
+ * @param object $curl_header Any necessary header values, like an API token
+ *
+ * @return Object The curl response object
+ */
+function dspdl_api_run_curl_command($curl_url, $curl_request_type, $curl_post_fields, $curl_header) {
+    $curl = curl_init();
+
+    curl_setopt_array($curl, array(
+        CURLOPT_URL            => $curl_url,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_ENCODING       => "",
+        CURLOPT_MAXREDIRS      => 10,
+        CURLOPT_TIMEOUT        => 30,
+        CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,
+        CURLOPT_CUSTOMREQUEST  => $curl_request_type,
+        CURLOPT_POSTFIELDS     => $curl_request_type == 'POST' ? $curl_post_fields : "",
+        CURLOPT_HTTPHEADER     => $curl_header,
+    ));
+
+    $response = curl_exec($curl);
+    $err      = curl_error($curl);
+
+    curl_close($curl);
+    return (object) compact('response', 'err');
+}
 
 /**
  * Get the client token for the current user
@@ -113,8 +157,17 @@ function dspdl_customer_form_shortcode() {
  * Enqueue scripts and styles.
  */
 function dspdl_scripts() {
-    wp_enqueue_style( 'dspdl-style', plugin_dir_url( __FILE__ ) . '/style.css');
-    wp_enqueue_script( 'dspdl-main', plugin_dir_url( __FILE__ ) . '/main.js', array('jquery') , '1.0.0', true );
+    wp_enqueue_style( 'dspdl-style', plugin_dir_url( __FILE__ ) . '/css/style.css');
+    wp_enqueue_script( 'dspdl-main', plugin_dir_url( __FILE__ ) . '/js/main.js', array('jquery') , '1.0.0', true );
     wp_localize_script( 'dspdl-main', 'dspdl_ajax', array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) );
+}
+
+/**
+ * Enqueue scripts for admin.
+ */
+function dspdl_admin_scripts() {
+    wp_enqueue_style( 'dspdl-admin-style', plugin_dir_url( __FILE__ ) . '/css/admin.css');
+    wp_enqueue_script( 'dspdl-admin-main', plugin_dir_url( __FILE__ ) . '/js/admin.js', array('jquery') , '1.0.0', true );
+    wp_localize_script( 'dspdl-admin-main', 'dspdl_ajax', array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) );
 }
 
