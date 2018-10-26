@@ -34,14 +34,14 @@ class DeviceCodes {
         return $token;
     }
 
-	function submit_device_code ($code) {
+	public function submit_device_code ($code) {
 
 		$toReturn = new stdClass;
 		$toReturn->success = false;
 		$toReturn->message = "There was an error: ";
         $token = $this->token;
 		// If we don't have a token, the API call will fail
-        if(!$token){
+        if(empty($token)){
         	$toReturn->message .= "No token present.";
             return $toReturn;
         }
@@ -74,6 +74,45 @@ class DeviceCodes {
         	$toReturn->success = $res->success;
         	$toReturn->message = $res->error ?: $res->message;
         	return $toReturn;
+        }
+    }
+
+    public function refresh_client_token($client_token) {
+        $toReturn = new stdClass;
+        $toReturn->success = false;
+        $toReturn->message = "There was an error: ";
+        $token = $this->token;
+        // If we don't have a token, the API call will fail
+        if(empty($token)){
+            $toReturn->message .= "No token present.";
+            return $toReturn;
+        }
+
+        $customer_id = get_user_meta( get_current_user_id(), "dotstudiopro_customer_id", true);
+
+        if (empty($client_token)) {
+            $toReturn->message .= "No client token sent.";
+            return $toReturn;
+        }
+
+        $result = dspdl_api_run_curl_command($this->base_api_url . "/users/token/refresh",
+            "POST", "",
+            array(
+                "Cache-Control: no-cache",
+                "x-access-token:" . $token,
+                "x-client-token:" . $client_token
+            ));
+        if ($result->err) {
+            $this->error .= " cURL Error: $result->err";
+            $toReturn->message .= $result->err;
+            return $toReturn;
+        } else {
+            $res = json_decode($result->response);
+            $toReturn->success = $res->success;
+            if ($res->success) {
+                $toReturn->client_token = $res->client_token;
+            }
+            return $toReturn;
         }
     }
 }

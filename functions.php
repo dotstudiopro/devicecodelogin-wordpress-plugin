@@ -62,8 +62,8 @@ function dspdl_get_client_token () {
     if (empty($token)) return false;
     // If the token isn't expired yet...
     if ($expiration - time() > 0) return $token;
-    $dspapi = new Dwg_Dotstudio();
-    $spotlight = $dspapi->DotApiCommand("refresh-client-token", array("client_token" => $token));
+		$dspdl = new DeviceCodes();
+    $spotlight = $dspdl->refresh_client_token($token);
     // If we failed to get a token from the API, we can't proceed
     if (!$spotlight) return false;
     // Looks like everything worked, save the new token
@@ -84,8 +84,8 @@ function dspdl_send_customer_code ( $code ) {
 	if (empty($token)) return false;
 	if (empty($code)) return false;
 
-	$dspapi = new Dwg_Dotstudio();
-	return $dspapi->DotApiCommand("send-device-code", array("code" => $code));
+	$dspdl = new DeviceCodes();
+	return $dspdl->submit_device_code($code);
 }
 
 /**
@@ -152,6 +152,29 @@ function dspdl_customer_form_shortcode() {
 	}
 	return $form;
 }
+
+/**
+ * Add a dotstudioPRO customer ID to the user that we get back from Auth0
+ *
+ * @param integer $user_id - WordPress user ID
+ * @param stdClass $userinfo - user information object from Auth0
+ * @param boolean $is_new - true if the user was created in WordPress, false if not
+ * @param string $id_token - ID token for the user from Auth0 (not used in code flow)
+ * @param string $access_token - bearer access token from Auth0 (not used in implicit flow)
+ */
+function dspdl_add_customer_id_to_user ( $user_id, $userinfo, $is_new, $id_token, $access_token ) {
+    // Ensure we have the user metadata that we need
+    if (empty($userinfo->user_metadata->customer) || empty($userinfo->user_metadata->spotlight)) return;
+    $customer_id = $userinfo->user_metadata->customer;
+    $spotlight = $userinfo->user_metadata->spotlight;
+    // Save the customer id to WP so we can call it wherever we have the user after they're logged in
+    update_user_meta( $user_id, "dotstudiopro_customer_id", $customer_id);
+    update_user_meta( $user_id, "dotstudiopro_client_token", $spotlight);
+    update_user_meta( $user_id, "dotstudiopro_client_token_expiration", time() + 5400);
+}
+
+// Used to add a DSP customer_id to a Wordpress user
+add_action( 'auth0_user_login', 'dspdl_add_customer_id_to_user', 10, 5 );
 
 /**
  * Enqueue scripts and styles.
