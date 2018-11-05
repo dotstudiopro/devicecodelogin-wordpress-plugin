@@ -109,7 +109,8 @@ function dspdl_ajax_customer_code() {
 	$send = dspdl_send_customer_code ( $_POST['code'] );
 	// If sending failed, nothing to do
 	if (!$send->success) {
-		$toReturn->message .= $send->error;
+		$toReturn->stuff = json_encode($send);
+		$toReturn->message .= ( $send->error ?: $send->message );
 		die(json_encode($toReturn));
 	}
 

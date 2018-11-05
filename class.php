@@ -2,7 +2,7 @@
 
 class DeviceCodes {
 
-    __construct() {
+    function __construct() {
         $this->token = $this->api_token_check();
         $this->base_api_url = "https://api.myspotlight.tv";
     }
@@ -10,10 +10,10 @@ class DeviceCodes {
     private function api_token_check() {
         $token = get_option("dspdl_dsp_api_token");
         $token_expiration = get_option("dspdl_dsp_api_token_expiration");
-        if ($token_expiration <= time()) {
+        if (!empty($token_expiration) && is_numeric($token_expiration) && $token_expiration <= time() || ( empty($token_expiration) || empty($token) )) {
             $api_key = get_option("dspdl_dsp_api_key");
-            if (empty($api_key)) return false;a12878949f4ea52703ab6a07c662b31895886cea
-            $result = dspdl_api_run_curl_command($this->base_api_url . "/", "POST", "------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"key\"\r\n\r\n$api_key\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW--",
+            if (empty($api_key)) return false;
+            $result = dspdl_api_run_curl_command($this->base_api_url . "/token", "POST", "------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"key\"\r\n\r\n$api_key\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW--",
                 array(
                     "Cache-Control: no-cache",
                     "content-type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW"

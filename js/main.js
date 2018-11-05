@@ -18,7 +18,6 @@ jQuery(document).ready(function(){
 		jQuery(".dspdl-customer-form-button > button").height(jQuery(".dspdl-customer-form-button > button").height());
 		// Remove the button text so we don't have any overlayed text on our background loader
 		jQuery(".dspdl-customer-form-button > button").html("").addClass('activateloader');
-
 		jQuery.post(dspdl_ajax.ajax_url, {
 			code: code,
 			action: "dspdl_ajax_customer_code"

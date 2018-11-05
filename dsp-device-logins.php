@@ -7,6 +7,9 @@ Author:       DSP
 Text Domain:  dsp-auth0
 */
 
+// Require the DeviceCodes class so we can manipulate/send codes
+require("class.php");
+
 require("functions.php");
 
 // Functionality to be able to process the post from the device code form

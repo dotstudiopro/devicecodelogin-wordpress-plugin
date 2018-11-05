@@ -4,7 +4,7 @@ jQuery(".dspdl-device-login-settings").submit(function(e) {
   jQuery(".dspdl-device-login-settings button").prop('disabled', true);
   var save_message = jQuery(".dspdl-device-login-settings").find(".save-message");
   jQuery(save_message).removeClass('dspdl-options-save-success').removeClass('dspdl-options-save-failure');
-  var url = dspdl_ajax.ajaxurl;
+  var url = dspdl_ajax.ajax_url;
   var dspdl_device_settings_save = jQuery.post(
     url,
     {
