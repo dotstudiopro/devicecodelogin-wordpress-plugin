@@ -24,25 +24,25 @@ function dspdl_save_admin_options() {
  * @return Object The curl response object
  */
 function dspdl_api_run_curl_command($curl_url, $curl_request_type, $curl_post_fields, $curl_header) {
-    $curl = curl_init();
+  $curl = curl_init();
 
-    curl_setopt_array($curl, array(
-        CURLOPT_URL            => $curl_url,
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_ENCODING       => "",
-        CURLOPT_MAXREDIRS      => 10,
-        CURLOPT_TIMEOUT        => 30,
-        CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,
-        CURLOPT_CUSTOMREQUEST  => $curl_request_type,
-        CURLOPT_POSTFIELDS     => $curl_request_type == 'POST' ? $curl_post_fields : "",
-        CURLOPT_HTTPHEADER     => $curl_header,
-    ));
+  curl_setopt_array($curl, array(
+      CURLOPT_URL            => $curl_url,
+      CURLOPT_RETURNTRANSFER => true,
+      CURLOPT_ENCODING       => "",
+      CURLOPT_MAXREDIRS      => 10,
+      CURLOPT_TIMEOUT        => 30,
+      CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,
+      CURLOPT_CUSTOMREQUEST  => $curl_request_type,
+      CURLOPT_POSTFIELDS     => $curl_request_type == 'POST' ? $curl_post_fields : "",
+      CURLOPT_HTTPHEADER     => $curl_header,
+  ));
 
-    $response = curl_exec($curl);
-    $err      = curl_error($curl);
+  $response = curl_exec($curl);
+  $err      = curl_error($curl);
 
-    curl_close($curl);
-    return (object) compact('response', 'err');
+  curl_close($curl);
+  return (object) compact('response', 'err');
 }
 
 /**
@@ -53,23 +53,23 @@ function dspdl_api_run_curl_command($curl_url, $curl_request_type, $curl_post_fi
  * @return Boolean Whether or not we succeeded in sending the customer code
  */
 function dspdl_get_client_token () {
-    $user_id = get_current_user_id();
-    if (empty($user_id)) return false; // User isn't logged in
-    $token = get_user_meta( $user_id, "dotstudiopro_client_token", true);
-    $expiration = get_user_meta( $user_id, "dotstudiopro_client_token_expiration", true);
-    // The user didn't log in via the Auth0 Lock if this empty, so we have
-    // no way of connecting the user to DSP; we cannot do anything token-related
-    if (empty($token)) return false;
-    // If the token isn't expired yet...
-    if ($expiration - time() > 0) return $token;
-		$dspdl = new DeviceCodes();
-    $spotlight = $dspdl->refresh_client_token($token);
-    // If we failed to get a token from the API, we can't proceed
-    if (!$spotlight) return false;
-    // Looks like everything worked, save the new token
-    update_user_meta( $user_id, "dotstudiopro_client_token", $spotlight);
-    update_user_meta( $user_id, "dotstudiopro_client_token_expiration", time() + 5400);
-    return $spotlight;
+  $user_id = get_current_user_id();
+  if (empty($user_id)) return false; // User isn't logged in
+  $token = get_user_meta( $user_id, "dotstudiopro_client_token", true);
+  $expiration = get_user_meta( $user_id, "dotstudiopro_client_token_expiration", true);
+  // The user didn't log in via the Auth0 Lock if this empty, so we have
+  // no way of connecting the user to DSP; we cannot do anything token-related
+  if (empty($token)) return false;
+  // If the token isn't expired yet...
+  if ($expiration - time() > 0) return $token;
+	$dspdl = new DeviceCodes();
+  $spotlight = $dspdl->refresh_client_token($token);
+  // If we failed to get a token from the API, we can't proceed
+  if (!$spotlight) return false;
+  // Looks like everything worked, save the new token
+  update_user_meta( $user_id, "dotstudiopro_client_token", $spotlight);
+  update_user_meta( $user_id, "dotstudiopro_client_token_expiration", time() + 5400);
+  return $spotlight;
 }
 
 /**
@@ -164,14 +164,14 @@ function dspdl_customer_form_shortcode() {
  * @param string $access_token - bearer access token from Auth0 (not used in implicit flow)
  */
 function dspdl_add_customer_id_to_user ( $user_id, $userinfo, $is_new, $id_token, $access_token ) {
-    // Ensure we have the user metadata that we need
-    if (empty($userinfo->user_metadata->customer) || empty($userinfo->user_metadata->spotlight)) return;
-    $customer_id = $userinfo->user_metadata->customer;
-    $spotlight = $userinfo->user_metadata->spotlight;
-    // Save the customer id to WP so we can call it wherever we have the user after they're logged in
-    update_user_meta( $user_id, "dotstudiopro_customer_id", $customer_id);
-    update_user_meta( $user_id, "dotstudiopro_client_token", $spotlight);
-    update_user_meta( $user_id, "dotstudiopro_client_token_expiration", time() + 5400);
+  // Ensure we have the user metadata that we need
+  if (empty($userinfo->user_metadata->customer) || empty($userinfo->user_metadata->spotlight)) return;
+  $customer_id = $userinfo->user_metadata->customer;
+  $spotlight = $userinfo->user_metadata->spotlight;
+  // Save the customer id to WP so we can call it wherever we have the user after they're logged in
+  update_user_meta( $user_id, "dotstudiopro_customer_id", $customer_id);
+  update_user_meta( $user_id, "dotstudiopro_client_token", $spotlight);
+  update_user_meta( $user_id, "dotstudiopro_client_token_expiration", time() + 5400);
 }
 
 // Used to add a DSP customer_id to a Wordpress user
@@ -181,17 +181,20 @@ add_action( 'auth0_user_login', 'dspdl_add_customer_id_to_user', 10, 5 );
  * Enqueue scripts and styles.
  */
 function dspdl_scripts() {
-    wp_enqueue_style( 'dspdl-style', plugin_dir_url( __FILE__ ) . '/css/style.css');
-    wp_enqueue_script( 'dspdl-main', plugin_dir_url( __FILE__ ) . '/js/main.js', array('jquery') , '1.0.0', true );
-    wp_localize_script( 'dspdl-main', 'dspdl_ajax', array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) );
+	// Get the current page slug so we can redirect to it after login
+	$the_page = sanitize_post( $GLOBALS['wp_the_query']->get_queried_object() );
+	$slug = $the_page->post_name;
+  wp_enqueue_style( 'dspdl-style', plugin_dir_url( __FILE__ ) . '/css/style.css');
+  wp_enqueue_script( 'dspdl-main', plugin_dir_url( __FILE__ ) . '/js/main.js', array('jquery') , '1.0.0', true );
+  wp_localize_script( 'dspdl-main', 'dspdl_ajax', array( 'ajax_url' => admin_url( 'admin-ajax.php' ), 'login_url' =>  wp_login_url(site_url( "/$slug/" )) ) );
 }
 
 /**
  * Enqueue scripts for admin.
  */
 function dspdl_admin_scripts() {
-    wp_enqueue_style( 'dspdl-admin-style', plugin_dir_url( __FILE__ ) . '/css/admin.css');
-    wp_enqueue_script( 'dspdl-admin-main', plugin_dir_url( __FILE__ ) . '/js/admin.js', array('jquery') , '1.0.0', true );
-    wp_localize_script( 'dspdl-admin-main', 'dspdl_ajax', array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) );
+  wp_enqueue_style( 'dspdl-admin-style', plugin_dir_url( __FILE__ ) . '/css/admin.css');
+  wp_enqueue_script( 'dspdl-admin-main', plugin_dir_url( __FILE__ ) . '/js/admin.js', array('jquery') , '1.0.0', true );
+  wp_localize_script( 'dspdl-admin-main', 'dspdl_ajax', array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) );
 }
 

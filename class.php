@@ -3,8 +3,8 @@
 class DeviceCodes {
 
     function __construct() {
-        $this->token = $this->api_token_check();
         $this->base_api_url = "https://api.myspotlight.tv";
+        $this->token = $this->api_token_check();
     }
 
     private function api_token_check() {

@@ -36,6 +36,10 @@ jQuery(document).ready(function(){
 		});
 	});
 	jQuery('.dspdl-customer-login-button').click(function(){
-		jQuery('#a0LoginButton').trigger('click');
+		if (jQuery('#a0LoginButton').length > 0) {
+			jQuery('#a0LoginButton').trigger('click');
+		} else {
+			window.location.href = dspdl_ajax.login_url;
+		}
 	});
 });
