@@ -37,9 +37,22 @@ jQuery(document).ready(function(){
 	});
 	jQuery('.dspdl-customer-login-button').click(function(){
 		if (jQuery('#a0LoginButton').length > 0) {
+			createCookie("dsp_auth0_before_login_path", window.location.pathname, 1);
 			jQuery('#a0LoginButton').trigger('click');
 		} else {
 			window.location.href = dspdl_ajax.login_url;
 		}
 	});
+  function createCookie(name, value, days) {
+      var expires;
+
+      if (days) {
+          var date = new Date();
+          date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+          expires = "; expires=" + date.toGMTString();
+      } else {
+          expires = "";
+      }
+      document.cookie = encodeURIComponent(name) + "=" + encodeURIComponent(value) + expires + "; path=/; domain=." + window.location.hostname + ";";
+  }
 });

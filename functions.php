@@ -178,6 +178,23 @@ function dspdl_add_customer_id_to_user ( $user_id, $userinfo, $is_new, $id_token
 add_action( 'auth0_user_login', 'dspdl_add_customer_id_to_user', 10, 5 );
 
 /**
+ * Get the last URL the person viewed and send them there
+ *
+ * @see WP_Auth0_LoginManager::do_login()
+ *
+ */
+function dspdl_user_redirect () {
+    // Figure out if we have a cookie value for this
+    if (empty($_COOKIE['dsp_auth0_before_login_path'])) return;
+    // If we do, we need to go somewhere with it
+    wp_safe_redirect( home_url($_COOKIE['dsp_auth0_before_login_path']) );
+    // Force cookie expiration so we delete it from the cookie storage
+    setcookie("dsp_auth0_before_login_path", "", time()-84600, "/", "." . $_SERVER['HTTP_HOST']);
+    exit;
+}
+add_action( 'template_redirect', 'dspdl_user_redirect', 10, 6 );
+
+/**
  * Enqueue scripts and styles.
  */
 function dspdl_scripts() {
