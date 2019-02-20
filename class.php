@@ -9,7 +9,7 @@ class DeviceCodes {
 
     private function api_token_check() {
         $token = get_option("dspdl_dsp_api_token");
-        $token_expiration = get_option("dspdl_dsp_api_token_expiration");
+        $token_expiration = (int) get_option("dspdl_dsp_api_token_expiration");
         if (!empty($token_expiration) && is_numeric($token_expiration) && $token_expiration <= time() || ( empty($token_expiration) || empty($token) )) {
             $api_key = get_option("dspdl_dsp_api_key");
             if (empty($api_key)) return false;
