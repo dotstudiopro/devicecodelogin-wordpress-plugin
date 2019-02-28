@@ -205,7 +205,7 @@ function dspdl_scripts() {
 	$slug = $the_page->post_name;
   wp_enqueue_style( 'dspdl-style', DSP_DEVICE_LOGIN_PLUGIN_ASSETS . 'css/style.min.css');
   wp_enqueue_script( 'dspdl-main', DSP_DEVICE_LOGIN_PLUGIN_ASSETS . 'js/main.min.js', array('jquery') , '1.0.0', true );
-  wp_localize_script( 'dspdl-main', 'dspdl_ajax', array( 'ajax_url' => admin_url( 'admin-ajax.php' ), 'login_url' =>  wp_login_url(site_url( "/$slug/" )) ) );
+  wp_localize_script( 'dspdl-main', 'dspdl_ajax', array( 'ajax_url' => admin_url( 'admin-ajax.php' ), 'login_url' =>  wp_login_url( get_permalink( get_page_by_path( $slug ) ) ) ) );
 }
 
 /**

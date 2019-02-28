@@ -36,12 +36,7 @@ jQuery(document).ready(function(){
 		});
 	});
 	jQuery('.dspdl-customer-login-button').click(function(){
-		if (jQuery('#a0LoginButton').length > 0) {
-			createCookie("dsp_auth0_before_login_path", window.location.pathname, 1);
-			jQuery('#a0LoginButton').trigger('click');
-		} else {
-			window.location.href = dspdl_ajax.login_url;
-		}
+		window.location.href = dspdl_ajax.login_url;
 	});
   function createCookie(name, value, days) {
       var expires;
