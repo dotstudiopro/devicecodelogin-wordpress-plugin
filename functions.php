@@ -1,5 +1,7 @@
 <?php
 
+define('DSP_DEVICE_LOGIN_PLUGIN_ASSETS', "https://wordpress-assets.dotstudiopro.com/device-logins-plugin/");
+
 /**
  * Simplify the cURL execution for various API commands within the curl commands class
  *
@@ -201,8 +203,8 @@ function dspdl_scripts() {
 	// Get the current page slug so we can redirect to it after login
 	$the_page = sanitize_post( $GLOBALS['wp_the_query']->get_queried_object() );
 	$slug = $the_page->post_name;
-  wp_enqueue_style( 'dspdl-style', plugin_dir_url( __FILE__ ) . 'assets/css/style.min.css');
-  wp_enqueue_script( 'dspdl-main', plugin_dir_url( __FILE__ ) . 'assets/js/main.min.js', array('jquery') , '1.0.0', true );
+  wp_enqueue_style( 'dspdl-style', DSP_DEVICE_LOGIN_PLUGIN_ASSETS . 'css/style.min.css');
+  wp_enqueue_script( 'dspdl-main', DSP_DEVICE_LOGIN_PLUGIN_ASSETS . 'js/main.min.js', array('jquery') , '1.0.0', true );
   wp_localize_script( 'dspdl-main', 'dspdl_ajax', array( 'ajax_url' => admin_url( 'admin-ajax.php' ), 'login_url' =>  wp_login_url(site_url( "/$slug/" )) ) );
 }
 
@@ -210,8 +212,8 @@ function dspdl_scripts() {
  * Enqueue scripts for admin.
  */
 function dspdl_admin_scripts() {
-  wp_enqueue_style( 'dspdl-admin-style', plugin_dir_url( __FILE__ ) . 'assets/css/admin.min.css');
-  wp_enqueue_script( 'dspdl-admin-main', plugin_dir_url( __FILE__ ) . 'assets/js/admin.min.js', array('jquery') , '1.0.0', true );
+  wp_enqueue_style( 'dspdl-admin-style', DSP_DEVICE_LOGIN_PLUGIN_ASSETS . 'css/admin.min.css');
+  wp_enqueue_script( 'dspdl-admin-main', DSP_DEVICE_LOGIN_PLUGIN_ASSETS . 'js/admin.min.js', array('jquery') , '1.0.0', true );
   wp_localize_script( 'dspdl-admin-main', 'dspdl_ajax', array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) );
 }
 
