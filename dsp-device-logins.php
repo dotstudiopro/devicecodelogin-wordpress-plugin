@@ -7,6 +7,17 @@ Author:       DSP
 Text Domain:  dsp-auth0
 */
 
+
+/**
+ * A script/plugin that communicates with our WP Updater service to determine plugin updates
+ */
+require 'plugin-update-checker/plugin-update-checker.php';
+$myUpdateChecker = Puc_v4_Factory::buildUpdateChecker(
+    'https://updates.wordpress.dotstudiopro.com/wp-update-server/?action=get_metadata&slug=dspdev-device-login-plugin',
+    __FILE__,
+    'dspdev-device-login-plugin'
+);
+
 // Require the DeviceCodes class so we can manipulate/send codes
 require("class.php");
 

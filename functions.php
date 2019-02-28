@@ -201,8 +201,8 @@ function dspdl_scripts() {
 	// Get the current page slug so we can redirect to it after login
 	$the_page = sanitize_post( $GLOBALS['wp_the_query']->get_queried_object() );
 	$slug = $the_page->post_name;
-  wp_enqueue_style( 'dspdl-style', plugin_dir_url( __FILE__ ) . '/css/style.css');
-  wp_enqueue_script( 'dspdl-main', plugin_dir_url( __FILE__ ) . '/js/main.js', array('jquery') , '1.0.0', true );
+  wp_enqueue_style( 'dspdl-style', plugin_dir_url( __FILE__ ) . 'assets/css/style.min.css');
+  wp_enqueue_script( 'dspdl-main', plugin_dir_url( __FILE__ ) . 'assets/js/main.min.js', array('jquery') , '1.0.0', true );
   wp_localize_script( 'dspdl-main', 'dspdl_ajax', array( 'ajax_url' => admin_url( 'admin-ajax.php' ), 'login_url' =>  wp_login_url(site_url( "/$slug/" )) ) );
 }
 
@@ -210,8 +210,8 @@ function dspdl_scripts() {
  * Enqueue scripts for admin.
  */
 function dspdl_admin_scripts() {
-  wp_enqueue_style( 'dspdl-admin-style', plugin_dir_url( __FILE__ ) . '/css/admin.css');
-  wp_enqueue_script( 'dspdl-admin-main', plugin_dir_url( __FILE__ ) . '/js/admin.js', array('jquery') , '1.0.0', true );
+  wp_enqueue_style( 'dspdl-admin-style', plugin_dir_url( __FILE__ ) . 'assets/css/admin.min.css');
+  wp_enqueue_script( 'dspdl-admin-main', plugin_dir_url( __FILE__ ) . 'assets/js/admin.min.js', array('jquery') , '1.0.0', true );
   wp_localize_script( 'dspdl-admin-main', 'dspdl_ajax', array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) );
 }
 
