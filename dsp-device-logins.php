@@ -30,9 +30,6 @@ add_action( 'wp_ajax_nopriv_dspdl_ajax_customer_code', 'dspdl_ajax_customer_code
 // Shortcode to show the form for customers to add a device login code
 add_shortcode( 'dspdl_show_form', 'dspdl_customer_form_shortcode' );
 
-// Scripts and styles
-add_action( 'wp_enqueue_scripts', 'dspdl_scripts' );
-
 /** Add Menu Entry **/
 function dspdl_options_menu() {
     add_options_page('Device Login Options', 'Device Login Options', 'manage_options', 'dspdl-device-login-options', 'dspdl_menu_page');

@@ -1,6 +1,7 @@
 <?php
 
 define('DSP_DEVICE_LOGIN_PLUGIN_ASSETS', "https://wordpress-assets.dotstudiopro.com/device-logins-plugin/");
+define('DSP_DEVICE_LOGIN_PLUGIN_CACHEBUSTER', date("YmdHi", filemtime( __DIR__ . '/assets/css/style.min.css')));
 
 /**
  * Simplify the cURL execution for various API commands within the curl commands class
@@ -127,6 +128,9 @@ function dspdl_ajax_customer_code() {
  */
 
 function dspdl_customer_form_shortcode() {
+	// Load our scripts only when the short code is called
+	dspdl_scripts();
+
 	$user_id = get_current_user_id();
 	$token = dspdl_get_client_token();
 
@@ -202,18 +206,24 @@ add_action( 'template_redirect', 'dspdl_user_redirect', 10, 6 );
 function dspdl_scripts() {
 	// Get the current page slug so we can redirect to it after login
 	$the_page = sanitize_post( $GLOBALS['wp_the_query']->get_queried_object() );
-	$slug = $the_page->post_name;
-  wp_enqueue_style( 'dspdl-style', DSP_DEVICE_LOGIN_PLUGIN_ASSETS . 'css/style.min.css');
-  wp_enqueue_script( 'dspdl-main', DSP_DEVICE_LOGIN_PLUGIN_ASSETS . 'js/main.min.js', array('jquery') , '1.0.0', true );
-  wp_localize_script( 'dspdl-main', 'dspdl_ajax', array( 'ajax_url' => admin_url( 'admin-ajax.php' ), 'login_url' =>  wp_login_url( get_permalink( get_page_by_path( $slug ) ) ) ) );
+	$link = wp_login_url();
+	// Make sure we have an actually post in the query, otherwise an error
+	// gets thrown
+	if (is_object($the_page)) {
+		$slug = $the_page->post_name;
+		$link = wp_login_url( get_permalink( get_page_by_path( $slug ) ) );
+	}
+  wp_enqueue_style( 'dspdl-style', DSP_DEVICE_LOGIN_PLUGIN_ASSETS . 'css/style.min.css', null, DSP_DEVICE_LOGIN_PLUGIN_CACHEBUSTER);
+  wp_enqueue_script( 'dspdl-main', DSP_DEVICE_LOGIN_PLUGIN_ASSETS . 'js/main.min.js', array('jquery') , DSP_DEVICE_LOGIN_PLUGIN_CACHEBUSTER, true );
+  wp_localize_script( 'dspdl-main', 'dspdl_ajax', array( 'ajax_url' => admin_url( 'admin-ajax.php' ), 'login_url' =>  $link ) );
 }
 
 /**
  * Enqueue scripts for admin.
  */
 function dspdl_admin_scripts() {
-  wp_enqueue_style( 'dspdl-admin-style', DSP_DEVICE_LOGIN_PLUGIN_ASSETS . 'css/admin.min.css');
-  wp_enqueue_script( 'dspdl-admin-main', DSP_DEVICE_LOGIN_PLUGIN_ASSETS . 'js/admin.min.js', array('jquery') , '1.0.0', true );
+  wp_enqueue_style( 'dspdl-admin-style', DSP_DEVICE_LOGIN_PLUGIN_ASSETS . 'css/admin.min.css', null, DSP_DEVICE_LOGIN_PLUGIN_CACHEBUSTER);
+  wp_enqueue_script( 'dspdl-admin-main', DSP_DEVICE_LOGIN_PLUGIN_ASSETS . 'js/admin.min.js', array('jquery') , DSP_DEVICE_LOGIN_PLUGIN_CACHEBUSTER, true );
   wp_localize_script( 'dspdl-admin-main', 'dspdl_ajax', array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) );
 }
 
