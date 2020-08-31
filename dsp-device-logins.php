@@ -2,7 +2,7 @@
 /*
 Plugin Name:  dotstudioPRO Device Login Codes
 Description:  Gets a DSP customer via Auth0 (during login) and sets up the ability to connect a device login code to an account
-Version:      1.2.2
+Version:      1.2.4
 Author:       DSP
 Text Domain:  dsp-auth0
 */
