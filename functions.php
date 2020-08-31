@@ -171,8 +171,8 @@ function dspdl_customer_form_shortcode() {
  */
 function dspdl_add_customer_id_to_user ( $user_id, $userinfo, $is_new, $id_token, $access_token ) {
   // Ensure we have the user metadata that we need
-  if (empty($userinfo->user_metadata->customer) || empty($userinfo->user_metadata->spotlight)) return;
-  $customer_id = $userinfo->user_metadata->customer;
+  if (empty($userinfo->customer) || empty($userinfo->user_metadata->spotlight)) return;
+  $customer_id = $userinfo->customer;
   $spotlight = $userinfo->user_metadata->spotlight;
   // Save the customer id to WP so we can call it wherever we have the user after they're logged in
   update_user_meta( $user_id, "dotstudiopro_customer_id", $customer_id);
