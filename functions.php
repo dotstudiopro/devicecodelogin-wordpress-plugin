@@ -60,12 +60,17 @@ function dspdl_get_client_token () {
   if (empty($user_id)) return false; // User isn't logged in
   $token = get_user_meta( $user_id, "dotstudiopro_client_token", true);
   $expiration = get_user_meta( $user_id, "dotstudiopro_client_token_expiration", true);
-  // The user didn't log in via the Auth0 Lock if this empty, so we have
-  // no way of connecting the user to DSP; we cannot do anything token-related
+  // Storing these values with user meta was the old way of getting/setting a token;
+  // if we don't have one, assume this is a newer install and check the session
+  if (empty($token)) {
+    $token = $_SESSION['dotstudiopro_client_token'];
+    $expiration = $_SESSION['dotstudiopro_client_token_expiration'];
+  }
+  // If we still don't have a token, we don't have a token anywhere
   if (empty($token)) return false;
   // If the token isn't expired yet...
   if ($expiration - time() > 0) return $token;
-	$dspdl = new DeviceCodes();
+  $dspdl = new DeviceCodes();
   $spotlight = $dspdl->refresh_client_token($token);
   // If we failed to get a token from the API, we can't proceed
   if (!$spotlight) return false;
