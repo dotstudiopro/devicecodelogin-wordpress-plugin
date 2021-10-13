@@ -9,11 +9,11 @@ define('DSP_DEVICE_LOGIN_PLUGIN_CACHEBUSTER', date("YmdHi", filemtime( __DIR__ .
  * @return null
  */
 function dspdl_save_admin_options() {
-	if(!isset($_POST['dspdl_dsp_api_key'])) {
-		return wp_send_json_failure(400, array("message" => "Missing API Key"));
-	}
-	update_option("dspdl_dsp_api_key", $_POST['dspdl_dsp_api_key']);
-	return wp_send_json_success(200, array("message" => "Key saved successfully"));
+    if(!isset($_POST['dspdl_dsp_api_key'])) {
+        return wp_send_json_failure(400, array("message" => "Missing API Key"));
+    }
+    update_option("dspdl_dsp_api_key", $_POST['dspdl_dsp_api_key']);
+    return wp_send_json_success(200, array("message" => "Key saved successfully"));
 }
 
 /**
@@ -60,17 +60,16 @@ function dspdl_get_client_token () {
   if (empty($user_id)) return false; // User isn't logged in
   $token = get_user_meta( $user_id, "dotstudiopro_client_token", true);
   $expiration = get_user_meta( $user_id, "dotstudiopro_client_token_expiration", true);
-  // Storing these values with user meta was the old way of getting/setting a token;
-  // if we don't have one, assume this is a newer install and check the session
+  // The user didn't log in via the Auth0 Lock if this empty, so we have
+  // no way of connecting the user to DSP; we cannot do anything token-related
   if (empty($token)) {
     $token = $_SESSION['dotstudiopro_client_token'];
     $expiration = $_SESSION['dotstudiopro_client_token_expiration'];
   }
-  // If we still don't have a token, we don't have a token anywhere
   if (empty($token)) return false;
   // If the token isn't expired yet...
   if ($expiration - time() > 0) return $token;
-  $dspdl = new DeviceCodes();
+    $dspdl = new DeviceCodes();
   $spotlight = $dspdl->refresh_client_token($token);
   // If we failed to get a token from the API, we can't proceed
   if (!$spotlight) return false;
@@ -88,43 +87,43 @@ function dspdl_get_client_token () {
  * @return Boolean Whether or not we succeeded in sending the customer code
  */
 function dspdl_send_customer_code ( $code ) {
-	$token = dspdl_get_client_token();
-	if (empty($token)) return false;
-	if (empty($code)) return false;
+    $token = dspdl_get_client_token();
+    if (empty($token)) return false;
+    if (empty($code)) return false;
 
-	$dspdl = new DeviceCodes();
-	return $dspdl->submit_device_code($code);
+    $dspdl = new DeviceCodes();
+    return $dspdl->submit_device_code($code);
 }
 
 /**
  * Process AJAX request to send customer code and return response based on how sending goes.
  */
 function dspdl_ajax_customer_code() {
-	$token = dspdl_get_client_token();
-	$toReturn = new stdClass;
-	$toReturn->success = false;
-	$toReturn->message = "Could not complete the device code connection: ";
-	if (empty($token)) {
-		// We can't get a client token, so we can't connect the code with a customer
-		$toReturn->message .= "Invalid or missing client token.";
-		die(json_encode($toReturn));
-	}
-	if (empty($_POST['code'])) {
-		// We weren't given a code, so nothing to do
-		$toReturn->message .= "Code was not sent with request.";
-		die(json_encode($toReturn));
-	}
-	$send = dspdl_send_customer_code ( $_POST['code'] );
-	// If sending failed, nothing to do
-	if (!$send->success) {
-		$toReturn->stuff = json_encode($send);
-		$toReturn->message .= ( $send->error ?: $send->message );
-		die(json_encode($toReturn));
-	}
+    $token = dspdl_get_client_token();
+    $toReturn = new stdClass;
+    $toReturn->success = false;
+    $toReturn->message = "Could not complete the device code connection: ";
+    if (empty($token)) {
+        // We can't get a client token, so we can't connect the code with a customer
+        $toReturn->message .= "Invalid or missing client token.";
+        die(json_encode($toReturn));
+    }
+    if (empty($_POST['code'])) {
+        // We weren't given a code, so nothing to do
+        $toReturn->message .= "Code was not sent with request.";
+        die(json_encode($toReturn));
+    }
+    $send = dspdl_send_customer_code ( $_POST['code'] );
+    // If sending failed, nothing to do
+    if (!$send->success) {
+        $toReturn->stuff = json_encode($send);
+        $toReturn->message .= ( $send->error ?: $send->message );
+        die(json_encode($toReturn));
+    }
 
-	$toReturn->success = true;
-	$toReturn->message = "Account connected successfully! Please check your device.";
-	die(json_encode($toReturn));
+    $toReturn->success = true;
+    $toReturn->message = "Account connected successfully! Please check your device.";
+    die(json_encode($toReturn));
 }
 /**
  * The form for submitting a device login code
@@ -133,36 +132,37 @@ function dspdl_ajax_customer_code() {
  */
 
 function dspdl_customer_form_shortcode() {
-	// Load our scripts only when the short code is called
-	dspdl_scripts();
+    // Load our scripts only when the short code is called
+    dspdl_scripts();
 
-	$user_id = get_current_user_id();
-	$token = dspdl_get_client_token();
+    $user_id = get_current_user_id();
+    $token = dspdl_get_client_token();
 
-	if (empty($user_id) || empty($token)) {
-		ob_start(); ?>
-			<div class='dspdl-customer-form-container'>
-				<h3 class='dspdl-customer-form-login-message'>You must be logged in to submit a code. <button class='dspdl-customer-login-button'>Log in or sign up here</button></h3>
-			</div>
-		<?php
-		$form = ob_get_contents();
-		ob_end_clean();
-	} else {
-		ob_start(); ?>
-			<div class='dspdl-customer-form-container'>
-				<div class='dspdl-customer-form-code'>
-					<input type='text' name='dspdl-customer-code' />
-				</div>
-				<div class='dspdl-customer-form-button'>
-					<div class='dspdl-customer-form-message'></div>
-					<button class='btn btn-primary' type='button'>Submit Code</button>
-				</div>
-			</div>
-		<?php
-		$form = ob_get_contents();
-		ob_end_clean();
-	}
-	return $form;
+    if (empty($user_id) || empty($token)) {
+        ob_start(); ?>
+        <div style='display: none'><?php echo "$user_id |||| $token"; ?></div>
+    
+                <h3 class='dspdl-customer-form-login-message'>You must be logged in to submit a code. <button class='dspdl-customer-login-button'>Log in or sign up here</button></h3>
+            </div>
+        <?php
+        $form = ob_get_contents();
+        ob_end_clean();
+    } else {
+        ob_start(); ?>
+            <div class='dspdl-customer-form-container'>
+                <div class='dspdl-customer-form-code'>
+                    <input type='text' name='dspdl-customer-code' />
+                </div>
+                <div class='dspdl-customer-form-button'>
+                    <div class='dspdl-customer-form-message'></div>
+                    <button class='btn btn-primary' type='button'>Submit Code</button>
+                </div>
+            </div>
+        <?php
+        $form = ob_get_contents();
+        ob_end_clean();
+    }
+    return $form;
 }
 
 /**
@@ -214,15 +214,15 @@ add_action( 'template_redirect', 'dspdl_user_redirect', 10, 6 );
  * Enqueue scripts and styles.
  */
 function dspdl_scripts() {
-	// Get the current page slug so we can redirect to it after login
-	$the_page = sanitize_post( $GLOBALS['wp_the_query']->get_queried_object() );
-	$link = wp_login_url();
-	// Make sure we have an actually post in the query, otherwise an error
-	// gets thrown
-	if (is_object($the_page)) {
-		$slug = $the_page->post_name;
-		$link = wp_login_url( get_permalink( get_page_by_path( $slug ) ) );
-	}
+    // Get the current page slug so we can redirect to it after login
+    $the_page = sanitize_post( $GLOBALS['wp_the_query']->get_queried_object() );
+    $link = wp_login_url();
+    // Make sure we have an actually post in the query, otherwise an error
+    // gets thrown
+    if (is_object($the_page)) {
+        $slug = $the_page->post_name;
+        $link = wp_login_url( get_permalink( get_page_by_path( $slug ) ) );
+    }
   wp_enqueue_style( 'dspdl-style', DSP_DEVICE_LOGIN_PLUGIN_ASSETS . 'css/style.min.css', null, DSP_DEVICE_LOGIN_PLUGIN_CACHEBUSTER);
   wp_enqueue_script( 'dspdl-main', DSP_DEVICE_LOGIN_PLUGIN_ASSETS . 'js/main.min.js', array('jquery') , DSP_DEVICE_LOGIN_PLUGIN_CACHEBUSTER, true );
   wp_localize_script( 'dspdl-main', 'dspdl_ajax', array( 'ajax_url' => admin_url( 'admin-ajax.php' ), 'login_url' =>  $link ) );
@@ -236,4 +236,3 @@ function dspdl_admin_scripts() {
   wp_enqueue_script( 'dspdl-admin-main', DSP_DEVICE_LOGIN_PLUGIN_ASSETS . 'js/admin.min.js', array('jquery') , DSP_DEVICE_LOGIN_PLUGIN_CACHEBUSTER, true );
   wp_localize_script( 'dspdl-admin-main', 'dspdl_ajax', array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) );
 }
-
