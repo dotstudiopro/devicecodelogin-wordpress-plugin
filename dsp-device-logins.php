@@ -1,11 +1,26 @@
 <?php
-/*
-Plugin Name:  dotstudioPRO Device Login Codes
-Description:  Gets a DSP customer via Auth0 (during login) and sets up the ability to connect a device login code to an account
-Version:      1.3.0
-Author:       DSP
-Text Domain:  dsp-auth0
-*/
+
+/**
+ *
+ * This file is read by WordPress to generate the plugin information in the plugin
+ * Dashboard. This file also includes all of the dependencies used by the plugin,
+ * registers the activation and deactivation functions, and defines a function
+ * that starts the plugin.
+ *
+ * @link              https://www.dotstudiopro.com
+ * @since             1.0.1
+ * @package           Dotstudiopro_Device_Logins
+ *
+ * @wordpress-plugin
+ * Plugin Name:       dotstudioPRO Device Login Codes
+ * Plugin URI:        https://www.dotstudiopro.com
+ * Description:       Gets a DSP customer via Auth0 (during login) and sets up the ability to connect a device login code to an account
+ * Version:           1.4.0
+ * Author:            dotstudioPRO
+ * Author URI:        http://www.dotstudiopro.com
+ * License:           GPLv3
+ * Text Domain:       dsp-auth0
+ */
 
 
 /**
