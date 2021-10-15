@@ -48,7 +48,7 @@ class DeviceCodes {
             return $toReturn;
         }
 
-        $customer_id = get_user_meta( get_current_user_id(), "dotstudiopro_customer_id", true);
+        $customer_id = $_SESSION['dotstudiopro_customer_id'];
 
         if (empty($customer_id)) {
         	$toReturn->message .= "No customer_id found for this user.";

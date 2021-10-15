@@ -1,6 +1,6 @@
 {
   "name": "dotstudiopro-device-logins",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "A dotstudioPRO WP plugin that allows you to connect your account through dotstudioPRO to a streaming device such as Roku",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
