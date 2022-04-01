@@ -114,6 +114,7 @@ class DeviceCodes {
             if ($res->success) {
                 $toReturn->client_token = $res->client_token;
             }
+            unset($toReturn->message);
             return $toReturn;
         }
     }
