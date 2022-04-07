@@ -8,7 +8,7 @@
  * that starts the plugin.
  *
  * @link              https://www.dotstudiopro.com
- * @since             1.0.1
+ * @since             1.0.0
  * @package           Dotstudiopro_Device_Logins
  *
  * @wordpress-plugin
