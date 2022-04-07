@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.4.3] - 2022-04-07
+
+### Fixed
+- Added additional check for instance where client token ends up as an object but only sometimes
+
 ## [1.4.2] - 2022-04-01
 
 ### Fixed

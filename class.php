@@ -91,12 +91,21 @@ class DeviceCodes {
         }
 
         $customer_id = get_user_meta( get_current_user_id(), "dotstudiopro_customer_id", true);
+        
+        // This value sometimes ends up as an object
+        if (is_object($client_token)) {
+            if ($client_token->client_token) {
+                $client_token = $client_token->client_token;
+            } else {
+                $client_token = "";
+            }
+        }
 
         if (empty($client_token)) {
             $toReturn->message .= "No client token sent.";
             return $toReturn;
         }
-
+        
         $result = dspdl_api_run_curl_command($this->base_api_url . "/users/token/refresh",
             "POST", "",
             array(
